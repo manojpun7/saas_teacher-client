@@ -1,6 +1,11 @@
+import api from "@/lib/global/http/api";
 import { Status } from "@/lib/global/types/global-type";
-import IAuthInitialData, { IAuthData } from "@/lib/store/auth/auth-slice-type";
+import IAuthInitialData, {
+  IAuthData,
+  IAuthLoginData,
+} from "@/lib/store/auth/auth-slice-type";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { AppDispatch } from "../store";
 
 const initialState: IAuthInitialData = {
   status: Status.LOADING,
@@ -24,9 +29,17 @@ export const { setStatus, setAuthData } = authSlice.actions;
 export default authSlice.reducer;
 
 //api calls
-function teacherLogin() {
-  return async function teacherLoginThunk(data: any) {
+export function teacherLogin(data: IAuthLoginData) {
+  return async function teacherLoginThunk(dispatch: AppDispatch) {
     try {
-    } catch (error) {}
+      const response = await api.post("/auth/teacher-login", data);
+      if (response.status === 200) {
+        dispatch(setStatus(Status.SUCCESS));
+      } else {
+        dispatch(setStatus(Status.ERROR));
+      }
+    } catch (error) {
+      dispatch(setStatus(Status.ERROR));
+    }
   };
 }
